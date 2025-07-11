@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.venv/
+venv/
+env/
+*.swp
+
+# VSCode / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# macOS
+.DS_Store
+
+# Test/Logs
+*.log
+
+# 忽略PCA9685, Hailo等硬體相關暫存/模擬資料
+*.h5
+*.npy
+
+# Virtual environment
+eric_pi_arm/venv/

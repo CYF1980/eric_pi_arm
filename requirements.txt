@@ -1,0 +1,14 @@
+degirum
+degirum_cli
+degirum_tools
+board
+lgpio
+Adafruit-Blinka
+adafruit-circuitpython-busdevice
+adafruit-circuitpython-connectionmanager
+adafruit-circuitpython-pca9685
+adafruit-circuitpython-register
+adafruit-circuitpython-requests
+adafruit-circuitpython-typing
+Adafruit-PlatformDetect
+Adafruit-PureIO
