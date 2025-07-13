@@ -47,6 +47,14 @@ if __name__ == "__main__":
         palm.gesture_smooth_sync(GESTURES["ok"])
         time.sleep(1)
         palm.gesture_smooth_sync(GESTURES["relax"])
+        time.sleep(1)
+        palm.gesture_smooth_sync_humanlike({
+            "thumb": 60,
+            "index": 50,
+            "middle": 145,
+            "ring": 60,
+            "pinky": 45
+        })
     finally:
         pca.deinit()
         print("🧹 測試結束，已釋放資源")
