@@ -122,6 +122,38 @@ class FingerSmoother:
                 return self.states[finger][-1]
             return None
 
+from palm.palm import Palm
+from module.utils_pca9685 import find_pca9685_bus
+from adafruit_pca9685 import PCA9685
+
+# 初始化 Palm（放在 while loop 外）
+i2c = find_pca9685_bus()
+if i2c is None:
+    print("找不到 PCA9685，請檢查硬體！")
+    exit(1)
+pca = PCA9685(i2c)
+pca.frequency = 50
+palm = Palm(pca)
+
+FINGER_NAME_MAP = {'大拇指': 'thumb', '食指': 'index', '中指': 'middle', '無名指': 'ring', '小指': 'pinky'}
+FINGER_ACTION_ANGLE = {
+    'thumb': {'伸直': 150, '彎曲': 60},
+    'index': {'伸直': 130, '彎曲': 50},
+    'middle': {'伸直': 145, '彎曲': 45},
+    'ring': {'伸直': 130, '彎曲': 60},
+    'pinky': {'伸直': 120, '彎曲': 45},
+}
+
+def finger_status_to_angle(finger_status):
+    angles = {}
+    for zh_name, status in finger_status.items():
+        eng_name = FINGER_NAME_MAP[zh_name]
+        angle = FINGER_ACTION_ANGLE[eng_name].get(status, 90)
+        angles[eng_name] = angle
+    return angles
+
+prev_angles = None
+
 # ----------- argparse 新增 smoothing mode -------------
 ap = argparse.ArgumentParser()
 ap.add_argument('-i', '--input', type=str, default="", help="Video input device. Default auto-detect.")
@@ -228,6 +260,13 @@ while True:
         landmarks = blaze_landmark.denormalize_landmarks(normalized_landmarks, roi_affine)
         for landmark, flag in zip(landmarks, flags):
             finger_status = get_finger_states(landmark, mode=args.smooth)
+            angles = finger_status_to_angle(finger_status)
+
+            # 比較 angles 是否與上次不同（避免重複動作）
+            if angles != prev_angles:
+                palm.gesture_smooth_sync_humanlike(angles)
+                prev_angles = angles.copy()
+
             print('五指狀態（{}）：'.format(args.smooth), finger_status)
             draw_landmarks(output, landmark[:, :2], HAND_CONNECTIONS, size=2)
         draw_roi(output, roi_box)
